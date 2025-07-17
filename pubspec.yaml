@@ -13,14 +13,42 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
+
+  # Remote Database
   supabase_flutter: ^2.9.1
+
+  # Router
   go_router: ^16.0.0
+
+  # State Management
+  riverpod: ^2.6.1
+  flutter_riverpod: ^2.5.1
+
+  # Local storage
+  shared_preferences: ^2.5.3
+
+  # Class Generator
+  freezed_annotation: ^3.1.0
+
+  # Other
+  json_annotation: ^4.9.0
+  fpdart: ^1.1.1
+
+  # Custom util package
+  flutter_logger_plus: ^5.0.0
+
+  # Env
+  flutter_dotenv: ^5.2.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   flutter_lints: ^5.0.0
+  build_runner: ^2.5.4
+  freezed: ^3.1.0
+  json_serializable: ^6.9.5
+
 
 flutter:
 

@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'core/config/enums.dart';
 import 'core/config/router.dart';
-
-const String databaseUrl = 'https://kjswewwaunxtclvgwtnz.supabase.co';
-const String databaseAPIKey =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtqc3dld3dhdW54dGNsdmd3dG56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI3MjgyMTgsImV4cCI6MjA2ODMwNDIxOH0.NL572TkRx7525gmae9mWuRMysLC5Y5ej_W7foRA6NOA';
+import 'core/di/dependcy_injection.dart';
 
 void main() async {
-  await Supabase.initialize(url: databaseUrl, anonKey: databaseAPIKey);
+  await DependencyInjection.setup();
+  await Supabase.initialize(
+    url: dotenv.get(ENV_KEYS.SUPABASE_URL.name),
+    anonKey: dotenv.get(ENV_KEYS.SUPABASE_KEY.name),
+  );
+
   runApp(const MyApp());
 }
 
@@ -17,6 +21,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(routerConfig: router);
+    return MaterialApp.router(
+      routerConfig: router,
+      debugShowCheckedModeBanner: false,
+    );
   }
 }

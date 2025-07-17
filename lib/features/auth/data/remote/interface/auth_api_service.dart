@@ -9,5 +9,5 @@ abstract class AuthApiService {
 
   String? getUserEmail();
 
-  User? getCurrentUser();
+  // User? getCurrentUser();
 }
