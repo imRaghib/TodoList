@@ -11,6 +11,7 @@
 .svn/
 .swiftpm/
 .env
+
 migrate_working_dir/
 
 # IntelliJ related
@@ -44,8 +45,5 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-.idea/
-.dart_tool/
 build/
-.idea/
-.dart_tool/
+
