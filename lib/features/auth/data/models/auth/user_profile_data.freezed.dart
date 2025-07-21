@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserProfileData {
 
-@JsonKey(name: 'id') String? get id;@JsonKey(name: 'email') String? get email;
+@JsonKey(name: 'id') String? get id;@JsonKey(name: 'email') String? get email;@JsonKey(name: 'avatar_url') String? get avatar_url;
 /// Create a copy of UserProfileData
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $UserProfileDataCopyWith<UserProfileData> get copyWith => _$UserProfileDataCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserProfileData&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserProfileData&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.avatar_url, avatar_url) || other.avatar_url == avatar_url));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,email);
+int get hashCode => Object.hash(runtimeType,id,email,avatar_url);
 
 @override
 String toString() {
-  return 'UserProfileData(id: $id, email: $email)';
+  return 'UserProfileData(id: $id, email: $email, avatar_url: $avatar_url)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $UserProfileDataCopyWith<$Res>  {
   factory $UserProfileDataCopyWith(UserProfileData value, $Res Function(UserProfileData) _then) = _$UserProfileDataCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'id') String? id,@JsonKey(name: 'email') String? email
+@JsonKey(name: 'id') String? id,@JsonKey(name: 'email') String? email,@JsonKey(name: 'avatar_url') String? avatar_url
 });
 
 
@@ -65,10 +65,11 @@ class _$UserProfileDataCopyWithImpl<$Res>
 
 /// Create a copy of UserProfileData
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? email = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? email = freezed,Object? avatar_url = freezed,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String?,avatar_url: freezed == avatar_url ? _self.avatar_url : avatar_url // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -154,10 +155,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String? id, @JsonKey(name: 'email')  String? email)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String? id, @JsonKey(name: 'email')  String? email, @JsonKey(name: 'avatar_url')  String? avatar_url)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserProfileData() when $default != null:
-return $default(_that.id,_that.email);case _:
+return $default(_that.id,_that.email,_that.avatar_url);case _:
   return orElse();
 
 }
@@ -175,10 +176,10 @@ return $default(_that.id,_that.email);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String? id, @JsonKey(name: 'email')  String? email)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String? id, @JsonKey(name: 'email')  String? email, @JsonKey(name: 'avatar_url')  String? avatar_url)  $default,) {final _that = this;
 switch (_that) {
 case _UserProfileData():
-return $default(_that.id,_that.email);case _:
+return $default(_that.id,_that.email,_that.avatar_url);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -195,10 +196,10 @@ return $default(_that.id,_that.email);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'id')  String? id, @JsonKey(name: 'email')  String? email)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'id')  String? id, @JsonKey(name: 'email')  String? email, @JsonKey(name: 'avatar_url')  String? avatar_url)?  $default,) {final _that = this;
 switch (_that) {
 case _UserProfileData() when $default != null:
-return $default(_that.id,_that.email);case _:
+return $default(_that.id,_that.email,_that.avatar_url);case _:
   return null;
 
 }
@@ -210,11 +211,12 @@ return $default(_that.id,_that.email);case _:
 @JsonSerializable()
 
 class _UserProfileData implements UserProfileData {
-  const _UserProfileData({@JsonKey(name: 'id') this.id, @JsonKey(name: 'email') this.email});
+  const _UserProfileData({@JsonKey(name: 'id') this.id, @JsonKey(name: 'email') this.email, @JsonKey(name: 'avatar_url') this.avatar_url});
   factory _UserProfileData.fromJson(Map<String, dynamic> json) => _$UserProfileDataFromJson(json);
 
 @override@JsonKey(name: 'id') final  String? id;
 @override@JsonKey(name: 'email') final  String? email;
+@override@JsonKey(name: 'avatar_url') final  String? avatar_url;
 
 /// Create a copy of UserProfileData
 /// with the given fields replaced by the non-null parameter values.
@@ -229,16 +231,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserProfileData&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserProfileData&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.avatar_url, avatar_url) || other.avatar_url == avatar_url));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,email);
+int get hashCode => Object.hash(runtimeType,id,email,avatar_url);
 
 @override
 String toString() {
-  return 'UserProfileData(id: $id, email: $email)';
+  return 'UserProfileData(id: $id, email: $email, avatar_url: $avatar_url)';
 }
 
 
@@ -249,7 +251,7 @@ abstract mixin class _$UserProfileDataCopyWith<$Res> implements $UserProfileData
   factory _$UserProfileDataCopyWith(_UserProfileData value, $Res Function(_UserProfileData) _then) = __$UserProfileDataCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'id') String? id,@JsonKey(name: 'email') String? email
+@JsonKey(name: 'id') String? id,@JsonKey(name: 'email') String? email,@JsonKey(name: 'avatar_url') String? avatar_url
 });
 
 
@@ -266,10 +268,11 @@ class __$UserProfileDataCopyWithImpl<$Res>
 
 /// Create a copy of UserProfileData
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? email = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? email = freezed,Object? avatar_url = freezed,}) {
   return _then(_UserProfileData(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String?,avatar_url: freezed == avatar_url ? _self.avatar_url : avatar_url // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

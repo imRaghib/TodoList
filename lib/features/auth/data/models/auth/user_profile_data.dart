@@ -8,6 +8,7 @@ abstract class UserProfileData with _$UserProfileData {
   const factory UserProfileData({
     @JsonKey(name: 'id') String? id,
     @JsonKey(name: 'email') String? email,
+    @JsonKey(name: 'avatar_url') String? avatar_url,
   }) = _UserProfileData;
 
   factory UserProfileData.fromJson(Map<String, dynamic> json) =>

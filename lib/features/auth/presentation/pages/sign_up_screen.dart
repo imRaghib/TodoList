@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/config/router.dart';
 import '../../../../core/constants/dimens.dart';
@@ -28,21 +31,47 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
   bool shouldShowLoginButton() {
     if (_emailController.text.isNotEmpty &&
-        _passwordController.text.isNotEmpty) {
+        _passwordController.text.isNotEmpty &&
+        _imageFile != null) {
       return true;
     }
     return false;
   }
 
+  File? _imageFile;
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImage(ImageSource source) async {
+    final XFile? pickedFile = await _picker.pickImage(source: source);
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('SignUp'), centerTitle: true),
+      appBar: AppBar(
+        title: Text('Sign Up', style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
+      ),
       body: Padding(
         padding: Dimens().mediumEdgestInset,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (_imageFile != null)
+              Image.file(_imageFile!, height: 200)
+            else
+              GestureDetector(
+                onTap: () => _pickImage(ImageSource.gallery),
+                child: CircleAvatar(radius: 50, child: Icon(Icons.upload)),
+              ),
+
+            const SizedBox(height: 20),
+
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(
@@ -105,6 +134,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                               .attemptToSignUp(
                                 email: _emailController.text,
                                 password: _passwordController.text,
+                                imagePath: _imageFile!,
                               );
                         }
                       : null,

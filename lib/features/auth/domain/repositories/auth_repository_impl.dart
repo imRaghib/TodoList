@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fpdart/fpdart.dart';
 import 'package:supabase_demo/core/dio/results.dart';
 import 'package:supabase_demo/features/auth/domain/entities/signin/signin_request.dart';
@@ -6,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/config/enums.dart';
 import '../../../../core/utils/network/network.dart';
+import '../../data/models/auth/user_profile_data.dart';
 import '../../data/remote/interface/auth_api_service.dart';
 import 'interface/auth_respository.dart';
 
@@ -17,6 +20,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<AppError, User?>> attemptToRegister({
     required SignupRequest signupRequest,
+    required File profileImage,
   }) async {
     if (!await isNetworkAvailable) {
       return Left(
@@ -26,6 +30,7 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final result = await authApiService.attemptToRegister(
         signupRequest: signupRequest,
+        profileImage: profileImage,
       );
       if (result.data != null) {
         return Right(result.data);
@@ -52,7 +57,6 @@ class AuthRepositoryImpl implements AuthRepository {
       );
 
       if (result.data != null) {
-        // await authLocalDatasource.saveSession(result.data!);
         return Right(result.data);
       }
 
@@ -67,5 +71,24 @@ class AuthRepositoryImpl implements AuthRepository {
     final _ = await authApiService.logoutUserFromServer();
     await Future.delayed(const Duration(milliseconds: 500));
     return Future.value(true);
+  }
+
+  @override
+  Future<Either<AppError, UserProfileData?>> getUserById() async {
+    if (!await isNetworkAvailable) {
+      return Left(
+        AppError(message: LocalizationKeys.internet_not_available.name),
+      );
+    }
+    try {
+      final result = await authApiService.getProfileData(); // returns user data
+      if (result.data != null) {
+        return Right(result.data);
+      } else {
+        return Left(AppError(message: result.message));
+      }
+    } catch (e) {
+      return Left(AppError(message: e.toString()));
+    }
   }
 }

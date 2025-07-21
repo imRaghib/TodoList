@@ -14,7 +14,6 @@ class SigninNotifier extends _$SigninNotifier {
     required String email,
     required String password,
   }) async {
-    print("calling attept to signin");
     state = const SignInRequestStateLoading(loading: LoadingState());
     final singInRequest = SigninRequest(email: email, password: password);
     final result = await authRepository.attemptToSignIn(

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fpdart/fpdart.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -13,6 +15,7 @@ class SignupNotifier extends _$SignupNotifier {
   Future attemptToSignUp({
     required String email,
     required String password,
+    required File imagePath,
   }) async {
     state = const SignUpRequestStateLoading(loading: LoadingState());
 
@@ -20,6 +23,7 @@ class SignupNotifier extends _$SignupNotifier {
 
     final result = await authRepository.attemptToRegister(
       signupRequest: singUpRequest,
+      profileImage: imagePath,
     );
     result.fold(
       (left) {

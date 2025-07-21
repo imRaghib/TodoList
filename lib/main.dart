@@ -30,7 +30,6 @@ class MyApp extends StatelessWidget {
 }
 
 Future<void> initFunction() async {
-  print("calling initfunction");
   WidgetsFlutterBinding.ensureInitialized();
   await DependencyInjection.setup();
 

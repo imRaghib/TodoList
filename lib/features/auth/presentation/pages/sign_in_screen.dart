@@ -16,8 +16,8 @@ class SignInScreen extends ConsumerStatefulWidget {
 }
 
 class _SignInScreenState extends ConsumerState<SignInScreen> {
-  final _emailController = TextEditingController(text: 'raghib108@gmai.com');
-  final _passwordController = TextEditingController(text: 'cartoon1R');
+  final _emailController = TextEditingController(text: 'raghib123@gmail.com');
+  final _passwordController = TextEditingController(text: '123456');
 
   @override
   void dispose() {
@@ -101,13 +101,13 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 return ElevatedButton(
                   onPressed: shouldShowLoginButton() && !isLoading
                       ? () {
-                    ref
-                        .read(provider.notifier)
-                        .attemptToSignIn(
-                      email: _emailController.text,
-                      password: _passwordController.text,
-                    );
-                  }
+                          ref
+                              .read(provider.notifier)
+                              .attemptToSignIn(
+                                email: _emailController.text,
+                                password: _passwordController.text,
+                              );
+                        }
                       : null,
                   child: const Text('Login'),
                 );

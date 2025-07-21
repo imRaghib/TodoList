@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_demo/features/auth/domain/entities/user_profile/user_profile_state.dart';
 import 'package:supabase_demo/features/auth/presentation/notifier/logout/logout_notifier.dart';
+import 'package:supabase_demo/features/auth/presentation/notifier/user_profile/user_profile_notifier.dart';
 
 import '../../../../../core/config/router.dart';
 import '../../../../../core/constants/assets.dart';
 import '../../../../../core/constants/theme/theme.dart';
+import '../../../../../core/snackbar/snackbar.dart';
 import '../../data/models/todo.dart';
 import '../provider/todo_provider.dart';
 
@@ -35,6 +38,47 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       appBar: AppBar(
         title: Text('Index'),
         centerTitle: true,
+        toolbarHeight: 80,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: Consumer(
+            builder: (context, ref, child) {
+              final watcher = ref.watch(userProfileNotifierProvider);
+
+              switch (watcher) {
+                case UserProfileStateInitial():
+                  return const CircleAvatar(child: Icon(Icons.person));
+
+                case UserProfileStateLoading():
+                  return const CircleAvatar(
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  );
+
+                case UserProfileStateError(error: final error):
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    showSnackBar(message: error.message, context: context);
+                  });
+
+                  // Optionally invalidate only if necessary
+                  // ref.invalidate(userProfileNotifierProvider);
+
+                  return const CircleAvatar(child: Icon(Icons.error));
+
+                case UserProfileStateData(data: final data):
+                  if (data?.avatar_url != null) {
+                    return CircleAvatar(
+                      backgroundImage: NetworkImage(data!.avatar_url!),
+
+                      radius: 10,
+                    );
+                  } else {
+                    return const CircleAvatar(child: Icon(Icons.person));
+                  }
+              }
+            },
+          ),
+        ),
+        elevation: 1,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -50,6 +94,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   spacing: 10,
                   children: [
                     SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+
                     SvgPicture.asset(
                       Assets.mock,
                       width: MediaQuery.of(context).size.width * 0.8,
@@ -81,6 +126,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Icon(Icons.add),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Delay to avoid calling during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(userProfileNotifierProvider.notifier).getUserProfileById();
+    });
   }
 }
 

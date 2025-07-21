@@ -8,4 +8,5 @@ enum SupabaseTables {
   user_device_tokens,
   notifications,
   notification_templates,
+  images,
 }
