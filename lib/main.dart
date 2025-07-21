@@ -6,7 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/config/enums.dart';
 import 'core/config/router.dart';
 import 'core/constants/theme/theme.dart';
-import 'core/di/dependency_injection.dart';
+import 'core/di/injection_container.dart';
 
 void main() async {
   await initFunction();

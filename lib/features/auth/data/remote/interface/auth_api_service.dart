@@ -1,6 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../../../core/di/dependency_injection.dart';
+import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/dio/remote_response.dart';
 import '../../../domain/entities/signin/signin_request.dart';
 import '../../../domain/entities/signup/signup_request.dart';

@@ -2,7 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:supabase_demo/core/dio/results.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../../../core/di/dependency_injection.dart';
+import '../../../../../core/di/injection_container.dart';
 import '../../entities/signin/signin_request.dart';
 import '../../entities/signup/signup_request.dart';
 import '../auth_repository_impl.dart';
