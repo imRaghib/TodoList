@@ -1,13 +1,21 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../../core/di/dependency_injection.dart';
+import '../../../../../core/dio/remote_response.dart';
+import '../../../domain/entities/signin/signin_request.dart';
+import '../../../domain/entities/signup/signup_request.dart';
+import '../auth_api_service_impl.dart';
+
+final AuthApiService authApiService = serviceLocator.get<AuthApiServiceImpl>();
+
 abstract class AuthApiService {
-  Future<AuthResponse> signInWithEmailPassword(String email, String password);
+  Future<RemoteResponse<User?>> attemptToRegister({
+    required SignupRequest signupRequest,
+  });
 
-  Future<AuthResponse> signUpWithEmailPassword(String email, String password);
+  Future<RemoteResponse<User?>> attemptToSignIn({
+    required SigninRequest signinRequest,
+  });
 
-  Future<void> signOut();
-
-  String? getUserEmail();
-
-  // User? getCurrentUser();
+  Future<RemoteResponse<bool>> logoutUserFromServer();
 }

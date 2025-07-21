@@ -2,10 +2,14 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_logger_plus/flutter_logger_plus.dart';
+import 'package:supabase_demo/features/auth/domain/entities/signin/signin_request.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/config/enums.dart';
 import '../../../../core/dio/remote_response.dart';
+import '../../../common/data/enums/supabase_tables.dart';
 import '../../domain/entities/signup/signup_request.dart';
+import '../models/auth/user_profile_data.dart';
 import 'interface/auth_api_service.dart';
 
 class AuthApiServiceImpl implements AuthApiService {
@@ -16,29 +20,47 @@ class AuthApiServiceImpl implements AuthApiService {
     required SignupRequest signupRequest,
   }) async {
     try {
-      final AuthResponse response = await _supabaseClient.auth
-          .signInWithPassword(
-            email: signupRequest.email,
-            password: signupRequest.password,
-          );
+      final AuthResponse response = await _supabaseClient.auth.signUp(
+        email: signupRequest.email,
+        password: signupRequest.password,
+      );
 
       if (response.user?.id == null) {
-        return RemoteResponse.exceptionOccurred('Invalid User');
+        return RemoteResponse.exceptionOccurred(
+          LocalizationKeys.auth_failed_invalid_response.name,
+        );
       }
 
-      // await _supabaseClient
-      //     .from(SupabaseTables.profiles.name)
-      //     .insert(
-      //       UserProfileData(
-      //         id: response.user?.id.toString() ?? "",
-      //         fullName: signupRequest.fullName,
-      //         role: signupRequest.role,
-      //         phoneNumber: signupRequest.phoneNumber,
-      //         meals: 0,
-      //         locale: UserLocale.ar,
-      //         shouldEnableNotifications: true,
-      //       ).toJson(),
-      //     );
+      await _supabaseClient
+          .from(SupabaseTables.profiles.name)
+          .insert(
+            UserProfileData(
+              id: response.user?.id.toString() ?? "",
+              email: response.user?.email.toString() ?? "",
+            ).toJson(),
+          );
+      return RemoteResponse.withObject(response.user);
+    } catch (e) {
+      return handleSupabaseError<User>(e);
+    }
+  }
+
+  @override
+  Future<RemoteResponse<User?>> attemptToSignIn({
+    required SigninRequest signinRequest,
+  }) async {
+    try {
+      final AuthResponse response = await _supabaseClient.auth
+          .signInWithPassword(
+            email: signinRequest.email,
+            password: signinRequest.password ?? "",
+          );
+
+      if (response.user == null) {
+        return RemoteResponse.exceptionOccurred(
+          LocalizationKeys.auth_failed_invalid_response.name,
+        );
+      }
 
       return RemoteResponse.withObject(response.user);
     } catch (e) {
@@ -47,23 +69,19 @@ class AuthApiServiceImpl implements AuthApiService {
   }
 
   @override
-  Future<AuthResponse> signUpWithEmailPassword(
-    String email,
-    String password,
-  ) async {
-    return await _supabaseClient.auth.signUp(email: email, password: password);
-  }
+  Future<RemoteResponse<bool>> logoutUserFromServer() async {
+    RemoteResponse<bool> remoteResponse;
+    try {
+      await _supabaseClient.auth.signOut();
 
-  @override
-  Future<void> signOut() async {
-    await _supabaseClient.auth.signOut();
-  }
+      return RemoteResponse.withObject(true);
+    } catch (e) {
+      remoteResponse = RemoteResponse.exceptionOccurred(e.toString());
 
-  @override
-  String? getUserEmail() {
-    final session = _supabaseClient.auth.currentSession;
-    final user = session?.user;
-    return user?.email;
+      logger.error(e);
+    }
+
+    return remoteResponse;
   }
 
   RemoteResponse<T> handleSupabaseError<T>(dynamic exception) {
@@ -89,11 +107,5 @@ class AuthApiServiceImpl implements AuthApiService {
       logger.error("Unexpected Error: $exception");
       return RemoteResponse.exceptionOccurred("Something went wrong.");
     }
-  }
-
-  @override
-  Future<AuthResponse> signInWithEmailPassword(String email, String password) {
-    // TODO: implement signInWithEmailPassword
-    throw UnimplementedError();
   }
 }
