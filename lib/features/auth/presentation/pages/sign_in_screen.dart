@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/config/router.dart';
 import '../../../../core/constants/dimens.dart';
 import '../../../../core/snackbar/snackbar.dart';
+import '../../../../core/utils/functions.dart';
 import '../../domain/entities/signin/sign_in_request_state.dart';
 import '../notifier/signin/signin_notifier.dart';
 
@@ -37,9 +38,17 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('SignIn'), centerTitle: true),
+      appBar: AppBar(
+        title: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            'Sign In',
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+        ),
+      ),
       body: Padding(
-        padding: Dimens().mediumEdgestInset,
+        padding: Dimens().largeEdgestInset,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -67,7 +76,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 setState(() {});
               },
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 28),
+
             Consumer(
               builder: (BuildContext context, WidgetRef ref, Widget? child) {
                 final provider = signinNotifierProvider;
@@ -80,9 +90,13 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     break;
                   case SignInRequestStateLoading():
                     isLoading = true;
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      Functions.showLoading(context);
+                    });
                     break;
                   case SignInRequestStateError():
                     WidgetsBinding.instance.addPostFrameCallback((_) {
+                      router.pop();
                       showSnackBar(
                         message: watcher.error.message,
                         context: context,
@@ -93,12 +107,18 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   case SignInRequestStateData():
                     ref.invalidate(signinNotifierProvider);
                     WidgetsBinding.instance.addPostFrameCallback((_) {
+                      router.pop();
                       context.replaceNamed(Routes.homeScreen);
                     });
 
                     break;
                 }
                 return ElevatedButton(
+                  style: OutlinedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
                   onPressed: shouldShowLoginButton() && !isLoading
                       ? () {
                           ref
@@ -109,16 +129,15 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                               );
                         }
                       : null,
-                  child: const Text('Login'),
+                  child: const Text('Log In'),
                 );
               },
             ),
-            const Center(
-              child: Text(
-                'Already have an account?',
-                style: TextStyle(color: Colors.grey),
-              ),
-            ),
+            const SizedBox(height: 18),
+            Divider(),
+            const SizedBox(height: 28),
+            const Center(child: Text('Already have an account?')),
+
             const SizedBox(height: 8),
 
             OutlinedButton(
@@ -127,10 +146,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               },
               style: OutlinedButton.styleFrom(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                side: const BorderSide(color: Color(0xFF007BFF)),
-                foregroundColor: const Color(0xFF007BFF),
               ),
               child: const Text('Sign up'),
             ),

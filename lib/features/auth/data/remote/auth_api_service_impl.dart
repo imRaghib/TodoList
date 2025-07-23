@@ -32,29 +32,34 @@ class AuthApiServiceImpl implements AuthApiService {
           LocalizationKeys.auth_failed_invalid_response.name,
         );
       }
+      final result = await updateProfileData(profileImage: profileImage);
 
-      final storagePath = 'avatars/${response.user!.id}.png';
-      await _supabaseClient.storage
-          .from(SupabaseTables.images.name)
-          .uploadBinary(
-            storagePath,
-            await profileImage.readAsBytes(),
-            fileOptions: const FileOptions(contentType: 'image/png'),
-          );
-      String profileImageUrl = _supabaseClient.storage
-          .from(SupabaseTables.images.name)
-          .getPublicUrl(storagePath);
-
-      await _supabaseClient
-          .from(SupabaseTables.profiles.name)
-          .insert(
-            UserProfileData(
-              id: response.user?.id.toString() ?? "",
-              email: response.user?.email.toString() ?? "",
-              avatar_url: profileImageUrl,
-            ).toJson(),
-          );
-      return RemoteResponse.withObject(response.user);
+      // final storagePath = 'avatars/${response.user!.id}.png';
+      // await _supabaseClient.storage
+      //     .from(SupabaseTables.images.name)
+      //     .uploadBinary(
+      //       storagePath,
+      //       await profileImage.readAsBytes(),
+      //       fileOptions: const FileOptions(contentType: 'image/png'),
+      //     );
+      // String profileImageUrl = _supabaseClient.storage
+      //     .from(SupabaseTables.images.name)
+      //     .getPublicUrl(storagePath);
+      //
+      // await _supabaseClient
+      //     .from(SupabaseTables.profiles.name)
+      //     .insert(
+      //       UserProfileData(
+      //         id: response.user?.id.toString() ?? "",
+      //         email: response.user?.email.toString() ?? "",
+      //         avatar_url: profileImageUrl,
+      //       ).toJson(),
+      //     );
+      if (result.data != null) {
+        return RemoteResponse.withObject(response.user);
+      } else {
+        throw AuthApiException("Failed to create user");
+      }
     } catch (e) {
       return handleSupabaseError<User>(e);
     }
@@ -99,6 +104,32 @@ class AuthApiServiceImpl implements AuthApiService {
     return remoteResponse;
   }
 
+  @override
+  Future<RemoteResponse<UserProfileData?>> getProfileData() async {
+    try {
+      final userId = _supabaseClient.auth.currentUser?.id;
+      if (userId == null) {
+        return RemoteResponse.exceptionOccurred(
+          LocalizationKeys.user_not_logged_in.name,
+        );
+      }
+      final response = await _supabaseClient
+          .from(SupabaseTables.profiles.name)
+          .select()
+          .eq(SupabaseParams.id.name, userId)
+          .maybeSingle();
+
+      return RemoteResponse.withObject(
+        UserProfileData.fromJson(response ?? {}),
+      );
+    } catch (e) {
+      logger.error(e);
+      return RemoteResponse.exceptionOccurred(
+        LocalizationKeys.something_went_wrong.name,
+      );
+    }
+  }
+
   RemoteResponse<T> handleSupabaseError<T>(dynamic exception) {
     if (exception is AuthException) {
       logger.error("Supabase Auth Error: ${exception.message}");
@@ -125,30 +156,46 @@ class AuthApiServiceImpl implements AuthApiService {
   }
 
   @override
-  Future<RemoteResponse<UserProfileData?>> getProfileData() async {
+  Future<RemoteResponse<bool>> updateProfileData({
+    required File profileImage,
+  }) async {
     try {
-      final userId = _supabaseClient.auth.currentUser?.id;
-      if (userId == null) {
-        return RemoteResponse.exceptionOccurred(
-          LocalizationKeys.user_not_logged_in.name,
-        );
-      }
-      //fetches id from session, sends a request to get user data
+      final response = _supabaseClient.auth.currentSession;
+      final storagePath = 'avatars/${response!.user.id}.png';
 
-      final response = await _supabaseClient
+      await _supabaseClient.storage.from(SupabaseTables.images.name).remove([
+        storagePath,
+      ]);
+
+      await _supabaseClient.storage
+          .from(SupabaseTables.images.name)
+          .uploadBinary(
+            storagePath,
+            await profileImage.readAsBytes(),
+            fileOptions: const FileOptions(contentType: 'image/png'),
+          );
+      String profileImageUrl = _supabaseClient.storage
+          .from(SupabaseTables.images.name)
+          .getPublicUrl(storagePath);
+
+      await _supabaseClient
           .from(SupabaseTables.profiles.name)
-          .select()
-          .eq(SupabaseParams.id.name, userId)
-          .maybeSingle();
-
-      return RemoteResponse.withObject(
-        UserProfileData.fromJson(response ?? {}),
-      );
+          .insert(
+            UserProfileData(
+              id: response.user.id.toString(),
+              email: response.user.email.toString(),
+              avatar_url: profileImageUrl,
+            ).toJson(),
+          );
+      return RemoteResponse.withObject(true);
     } catch (e) {
-      logger.error(e);
-      return RemoteResponse.exceptionOccurred(
-        LocalizationKeys.something_went_wrong.name,
-      );
+      return RemoteResponse.exceptionOccurred(e.toString());
     }
+  }
+
+  @override
+  Future<RemoteResponse<bool>> updateUserPassword() {
+    // TODO: implement updateUserPassword
+    throw UnimplementedError();
   }
 }

@@ -7,13 +7,15 @@ part of 'todo.dart';
 // **************************************************************************
 
 _Todo _$TodoFromJson(Map<String, dynamic> json) => _Todo(
-  id: json['id'] as String,
-  title: json['title'] as String,
-  isDone: json['isDone'] as bool? ?? false,
+  id: json['id'] as String?,
+  userId: json['user_id'] as String,
+  todo: json['todo'] as String,
+  isDone: json['is_done'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$TodoToJson(_Todo instance) => <String, dynamic>{
-  'id': instance.id,
-  'title': instance.title,
-  'isDone': instance.isDone,
+  if (instance.id case final value?) 'id': value,
+  'user_id': instance.userId,
+  'todo': instance.todo,
+  'is_done': instance.isDone,
 };

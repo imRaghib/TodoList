@@ -37,8 +37,8 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       return Left(AppError(message: result.message));
-    } catch (ex) {
-      return Left(AppError(message: ex.toString()));
+    } catch (e) {
+      return Left(AppError(message: e.toString()));
     }
   }
 
@@ -86,6 +86,33 @@ class AuthRepositoryImpl implements AuthRepository {
         return Right(result.data);
       } else {
         return Left(AppError(message: result.message));
+      }
+    } catch (e) {
+      return Left(AppError(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<AppError, bool>> updateProfileData({
+    required File profileImage,
+  }) async {
+    if (!await isNetworkAvailable) {
+      return Left(
+        AppError(message: LocalizationKeys.internet_not_available.name),
+      );
+    }
+
+    try {
+      final result = await authApiService.updateProfileData(
+        profileImage: profileImage,
+      );
+
+      if (result.data != null) {
+        return Right(true);
+      } else {
+        return Left(
+          AppError(message: LocalizationKeys.auth_failed_invalid_response.name),
+        );
       }
     } catch (e) {
       return Left(AppError(message: e.toString()));

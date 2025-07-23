@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_demo/features/auth/domain/entities/user_profile/user_profile_state.dart';
 import 'package:supabase_demo/features/auth/presentation/notifier/logout/logout_notifier.dart';
 import 'package:supabase_demo/features/auth/presentation/notifier/user_profile/user_profile_notifier.dart';
+import 'package:supabase_demo/features/home/todo/domain/entities/todo/todo_state.dart';
 
 import '../../../../../core/config/router.dart';
 import '../../../../../core/constants/assets.dart';
-import '../../../../../core/constants/theme/theme.dart';
 import '../../../../../core/snackbar/snackbar.dart';
 import '../../data/models/todo.dart';
-import '../provider/todo_provider.dart';
+import '../provider/todo_notifier.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -32,11 +32,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    // Delay to avoid calling during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(userProfileNotifierProvider.notifier).getUserProfileById();
+      ref.read(todoNotifierProvider.notifier).loadTodos();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final todos = ref.watch(todoProvider);
+    var offlineTodo = [];
+    var userId;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Index'),
+        title: Text('Todo', style: Theme.of(context).textTheme.headlineSmall),
         centerTitle: true,
         toolbarHeight: 80,
         leading: Padding(
@@ -59,21 +71,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     showSnackBar(message: error.message, context: context);
                   });
 
-                  // Optionally invalidate only if necessary
-                  // ref.invalidate(userProfileNotifierProvider);
+                  ref.invalidate(userProfileNotifierProvider);
 
                   return const CircleAvatar(child: Icon(Icons.error));
 
                 case UserProfileStateData(data: final data):
-                  if (data?.avatar_url != null) {
-                    return CircleAvatar(
-                      backgroundImage: NetworkImage(data!.avatar_url!),
+                  userId = data?.id;
 
-                      radius: 10,
-                    );
-                  } else {
-                    return const CircleAvatar(child: Icon(Icons.person));
-                  }
+                  return GestureDetector(
+                    onTap: () => router.pushNamed(Routes.editProfileScreen),
+                    child: data?.avatar_url != null
+                        ? CircleAvatar(
+                            radius: 10,
+                            backgroundImage: NetworkImage(data!.avatar_url!),
+                          )
+                        : const CircleAvatar(child: Icon(Icons.person)),
+                  );
               }
             },
           ),
@@ -89,36 +102,61 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       body: SafeArea(
         child: Center(
-          child: todos.isEmpty
-              ? Column(
-                  spacing: 10,
-                  children: [
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+          child: Consumer(
+            builder: (context, ref, child) {
+              final watcher = ref.watch(todoNotifierProvider);
 
-                    SvgPicture.asset(
-                      Assets.mock,
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      fit: BoxFit.contain,
-                    ),
-                    Text(
-                      'What do you want to do today?',
-                      style: AppTextStyle.displaySmall,
-                    ),
-                    Text(
-                      'Tap + to add your tasks',
-                      style: AppTextStyle.displaySmall,
-                    ),
-                  ],
-                )
-              : Consumer(
-                  builder: (context, ref, child) {
-                    return ListView(
-                      children: todos.map((todo) {
-                        return TodoListTile(todo: todo);
-                      }).toList(),
-                    );
-                  },
-                ),
+              switch (watcher) {
+                case TodoStateInitial():
+                  return const CircleAvatar(child: Icon(Icons.person));
+
+                case TodoStateLoading():
+                  return const CircleAvatar(
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  );
+
+                case TodoStateError(error: final error):
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    showSnackBar(message: error.message, context: context);
+                  });
+
+                  ref.invalidate(userProfileNotifierProvider);
+
+                  return const CircleAvatar(child: Icon(Icons.error));
+
+                case TodoStateData(data: final todo):
+                  offlineTodo = todo;
+                  return todo.isEmpty
+                      ? Column(
+                          spacing: 10,
+                          children: [
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.1,
+                            ),
+
+                            SvgPicture.asset(
+                              Assets.mock,
+                              width: MediaQuery.of(context).size.width * 0.8,
+                              fit: BoxFit.contain,
+                            ),
+                            Text(
+                              'What do you want to do today?',
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                            Text(
+                              'Tap + to add your tasks',
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                          ],
+                        )
+                      : ListView(
+                          children: todo.map((todo) {
+                            return TodoListTile(todo: todo);
+                          }).toList(),
+                        );
+              }
+            },
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -126,16 +164,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Icon(Icons.add),
       ),
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    // Delay to avoid calling during build
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(userProfileNotifierProvider.notifier).getUserProfileById();
-    });
   }
 }
 
@@ -147,16 +175,22 @@ class TodoListTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ListTile(
-      title: Text(todo.title),
+      title: Text(todo.todo),
       leading: Checkbox(
         value: todo.isDone,
-        onChanged: (_) => ref.read(todoProvider.notifier).toggleTodo(todo.id),
+        onChanged: (value) {
+          if (value != null) {
+            final updatedTodo = todo.copyWith(isDone: value);
+            ref.read(todoNotifierProvider.notifier).updateTodo(updatedTodo);
+          }
+        },
       ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
             icon: Icon(Icons.edit),
+
             onPressed: () => showDialog(
               context: context,
               builder: (_) => EditTodoDialog(todo: todo),
@@ -164,8 +198,10 @@ class TodoListTile extends ConsumerWidget {
           ),
           IconButton(
             icon: Icon(Icons.delete),
-            onPressed: () =>
-                ref.read(todoProvider.notifier).deleteTodo(todo.id),
+
+            onPressed: () {
+              ref.read(todoNotifierProvider.notifier).deleteTodo(todo.id!);
+            },
           ),
         ],
       ),
@@ -188,7 +224,7 @@ class _EditTodoDialogState extends ConsumerState<EditTodoDialog> {
   @override
   void initState() {
     super.initState();
-    controller = TextEditingController(text: widget.todo.title);
+    controller = TextEditingController(text: widget.todo.todo);
   }
 
   @override
@@ -209,9 +245,9 @@ class _EditTodoDialogState extends ConsumerState<EditTodoDialog> {
         TextButton(onPressed: () => router.pop(), child: Text('Cancel')),
         ElevatedButton(
           onPressed: () {
-            ref
-                .read(todoProvider.notifier)
-                .updateTodo(widget.todo.id, controller.text);
+            final updatedTodo = widget.todo.copyWith(todo: controller.text);
+            ref.read(todoNotifierProvider.notifier).updateTodo(updatedTodo);
+
             router.pop();
           },
           child: Text('Update'),

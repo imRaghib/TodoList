@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_demo/features/auth/presentation/pages/sign_up_screen.dart';
 import 'package:supabase_demo/features/home/todo/presentation/pages/add_todo_screen.dart';
+import 'package:supabase_demo/features/home/todo/presentation/pages/edit_profile_screen.dart';
 
 import '../../features/auth/presentation/pages/sign_in_screen.dart';
 import '../../features/home/todo/presentation/pages/home_screen.dart';
@@ -12,6 +13,7 @@ class Routes {
   static const signUpScreen = '/sign_up_screen';
   static const signInScreen = '/sign_in_screen';
   static const addTodoScreen = '/add_todo_screen';
+  static const editProfileScreen = '/edit_profile_screen';
 }
 
 final router = GoRouter(
@@ -43,6 +45,13 @@ final router = GoRouter(
       path: Routes.addTodoScreen,
       pageBuilder: (context, state) {
         return MaterialPage(child: AddTodoScreen());
+      },
+    ),
+    GoRoute(
+      name: Routes.editProfileScreen,
+      path: Routes.editProfileScreen,
+      pageBuilder: (context, state) {
+        return MaterialPage(child: EditProfileScreen());
       },
     ),
   ],

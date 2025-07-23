@@ -22,7 +22,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      theme: AppTheme.dark,
+      darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.dark,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
     );
@@ -32,7 +33,6 @@ class MyApp extends StatelessWidget {
 Future<void> initFunction() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DependencyInjection.setup();
-
   await dotenv.load();
   await Supabase.initialize(
     url: dotenv.get(ENV_KEYS.SUPABASE_URL.name),

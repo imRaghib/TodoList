@@ -25,4 +25,8 @@ abstract class AuthRepository {
   Future<bool> logoutUser();
 
   Future<Either<AppError, UserProfileData?>> getUserById();
+
+  Future<Either<AppError, bool>> updateProfileData({
+    required File profileImage,
+  });
 }

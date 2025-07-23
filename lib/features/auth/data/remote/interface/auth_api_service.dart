@@ -24,4 +24,8 @@ abstract class AuthApiService {
   Future<RemoteResponse<bool>> logoutUserFromServer();
 
   Future<RemoteResponse<UserProfileData?>> getProfileData();
+
+  Future<RemoteResponse<bool>> updateUserPassword();
+
+  Future<RemoteResponse<bool>> updateProfileData({required File profileImage});
 }
