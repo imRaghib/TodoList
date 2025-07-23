@@ -163,9 +163,9 @@ class AuthApiServiceImpl implements AuthApiService {
       final response = _supabaseClient.auth.currentSession;
       final storagePath = 'avatars/${response!.user.id}.png';
 
-      await _supabaseClient.storage.from(SupabaseTables.images.name).remove([
-        storagePath,
-      ]);
+      // await _supabaseClient.storage.from(SupabaseTables.images.name).remove([
+      //   storagePath,
+      // ]);
 
       await _supabaseClient.storage
           .from(SupabaseTables.images.name)
