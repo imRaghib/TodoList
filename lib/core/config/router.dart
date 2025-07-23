@@ -1,34 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:todolist/features/home/presentation/pages/add_todo_screen.dart';
-import 'package:todolist/features/home/presentation/pages/home_screen.dart';
+import 'package:supabase_demo/features/auth/presentation/pages/sign_up_screen.dart';
+import 'package:supabase_demo/features/home/todo/presentation/pages/add_todo_screen.dart';
+import 'package:supabase_demo/features/home/todo/presentation/pages/edit_profile_screen.dart';
 
+import '../../features/auth/presentation/pages/sign_in_screen.dart';
+import '../../features/home/todo/presentation/pages/home_screen.dart';
 import '../../main.dart';
 
 class Routes {
-  static const String homeScreen = '/home_screen';
-  static const String addTodoScreen = '/dashboard_screen';
+  static const homeScreen = '/home_screen';
+  static const signUpScreen = '/sign_up_screen';
+  static const signInScreen = '/sign_in_screen';
+  static const addTodoScreen = '/add_todo_screen';
+  static const editProfileScreen = '/edit_profile_screen';
 }
 
-// GoRouter configuration
 final router = GoRouter(
   initialLocation: initialRoute,
-
   routes: [
     GoRoute(
       name: Routes.homeScreen,
-      // Optional, add name to your routes. Allows you navigate by name instead of path
       path: Routes.homeScreen,
       pageBuilder: (context, state) {
         return MaterialPage(child: HomeScreen());
       },
     ),
     GoRoute(
+      name: Routes.signUpScreen,
+      path: Routes.signUpScreen,
+      pageBuilder: (context, state) {
+        return MaterialPage(child: SignUpScreen());
+      },
+    ),
+    GoRoute(
+      name: Routes.signInScreen,
+      path: Routes.signInScreen,
+      pageBuilder: (context, state) {
+        return MaterialPage(child: SignInScreen());
+      },
+    ),
+    GoRoute(
       name: Routes.addTodoScreen,
-      // Optional, add name to your routes. Allows you navigate by name instead of path
       path: Routes.addTodoScreen,
       pageBuilder: (context, state) {
         return MaterialPage(child: AddTodoScreen());
+      },
+    ),
+    GoRoute(
+      name: Routes.editProfileScreen,
+      path: Routes.editProfileScreen,
+      pageBuilder: (context, state) {
+        return MaterialPage(child: EditProfileScreen());
       },
     ),
   ],
